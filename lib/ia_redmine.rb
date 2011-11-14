@@ -19,7 +19,7 @@ module Ia::Redmine
 
     data = []
 
-    CSV.foreach(@csv_file, :col_sep => ';', :quote_char => '"', :headers => :first_row) do |row|
+    CSV.foreach(csv_file, :col_sep => ';', :quote_char => '"', :headers => :first_row) do |row|
       data << row
     end
 
@@ -32,7 +32,8 @@ module Ia::Redmine
                                        :fixed_version_id => row[4].to_i,
                                        :estimated_hours => row[5].to_i,
                                        :assigned_to_id => row[6].to_i,
-                                       :parent_id => row[7].to_i
+                                       :parent_id => row[7].to_i,
+                                       :tracker => row[8].to_i
                                       )
 
       if issue.save

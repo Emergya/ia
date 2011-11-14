@@ -37,11 +37,8 @@ module Ia::Git
   # Crea dos ramas: master (vacía) y doc (con los directorios de documentación)
   # * projectname(String): nombre del proyecto
   def git_scaffold(projectname)
-    pinfo("Creando el repositorio local de git para #{projectname}",2)
-    system("git init #{projectname}")
-    Dir.chdir projectname
+    pinfo("Creando estructura Git para el proyecto #{projectname}...")
 
-    create_empty_dir
     system("git add .gitignore")
 
     pinfo("Creando la estructura de la rama 'doc'",2)
@@ -51,6 +48,7 @@ module Ia::Git
   end
 
   def git_set_upstream(projectname)
+    git?
     pinfo("Configurando el repositorio remoto")
     upstream_uri = "git@github.com:Emergya/#{projectname}.git"
     system("git remote add upstream #{upstream_uri}")

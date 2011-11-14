@@ -164,6 +164,22 @@ command :drupal do |c|
   end
 end
 
+desc 'Manipula algunas de las caracteristicas de Drush'
+command :drush do |c|
+  c.desc 'Add drush alias'
+  c.switch [:a,:alias]
+
+  c.action do |global_options,options,args|
+
+    command?(options)
+
+    if options[:alias]
+      pinfo('Agregando alias a ~/.drush/')
+      drupal_rm_files(global_options[:pretend])
+    end
+  end
+end
+
 desc 'Crear o modifica la estructura del repositorio svn'
 long_desc 'El comando svn manipula el repositorio svn en el que se ejecuta. Se debe ejecutar en la raiz del repositorio'
 # arg_name 'init [command[ command]*]'
@@ -188,28 +204,23 @@ end
 
 desc 'Crear o modifica la estructura del repositorio git'
 long_desc 'El comando git manipula el repositorio git en el que se ejecuta. Se debe ejecutar en la raiz del repositorio'
-# arg_name 'init [command[ command]*]'
 command :git do |c|
-  c.desc 'Crea estructura inicial en el repositorio.'
-  c.arg_name 'Nombre del proyecto'
-  c.flag [:i,:init]
+  c.desc 'Crea estructura inicial en el repositorio. Se debe ejecutar dentro del repo git del proyecto.'
+  c.switch [:i,:init]
 
-  c.desc 'Configura el remote "upstream" del proyecto.'
+  c.desc 'Configura el remote "upstream" del proyecto. Se debe ejecutar dentro del repo git del proyecto.'
   c.switch [:u,:upstream]
-
-  #FIXME: Añadir comandos para:
-    # * Añadir el remote origin
+  
   c.action do |global_options,options,args|
-    raise "Necesitas especificar un comando y una opcion".color(:red) unless options.size >= 1
+    command?(options)
 
     if options[:init]
-      raise "El directorio actual ya es un repositorio".color(:red) if FileTest::directory?('.git')
-      pinfo("Creando estructura Git para el proyecto #{options[:init]}...")
-      git_scaffold(options[:init])
-      git_set_upstream(options[:init]) if options[:upstream]
-    elsif options[:upstream]
-      raise "El directorio actual no es un repositorio".color(:red) unless FileTest::directory?('.git')
+      git?
       projectname = File.split(Dir.pwd).last
+      
+      git_scaffold(projectname)
+      git_set_upstream(projectname) if options[:upstream]
+    elsif options[:upstream]
       git_set_upstream(projectname)
     end
 
@@ -219,7 +230,7 @@ end
 desc 'Interactua con Redmine usando un archivo en formato CSV'
 long_desc 'Este comando usa un archivo CSV (exportado de uan hoja de calculo por ejemplo) para interactuar con un Redmine concreto. Necesita una url y una apikey configurada'
 command :redmine do |c|
-  c.desc 'Exporta un archivo CSV a Redmine usando REST'
+  c.desc 'Importa un archivo CSV a Redmine usando REST'
   c.arg_name 'Archivo CSV para leer'
   c.flag [:e,:export]
   
